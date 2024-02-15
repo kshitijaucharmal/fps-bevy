@@ -7,6 +7,7 @@ use camera::CameraRenderingPlugin;
 use debug_tex::uv_debug_texture;
 use environment::EnvironmentPlugin;
 use obstacles::ObstaclePlugin;
+use player::PlayerPlugin;
 
 // Mods
 mod camera;
@@ -14,6 +15,7 @@ mod debug_tex;
 mod environment;
 mod ground;
 mod obstacles;
+mod player;
 
 fn main() {
     App::new()
@@ -40,6 +42,7 @@ fn main() {
         .add_plugins(EnvironmentPlugin)
         .add_plugins(CameraRenderingPlugin)
         .add_plugins(ObstaclePlugin)
+        .add_plugins(PlayerPlugin)
         .add_systems(Startup, ground::spawn_ground)
         .add_systems(Startup, setup_ball)
         // Run
