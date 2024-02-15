@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use bevy_flycam::prelude::*;
 
 pub struct CameraRenderingPlugin;
@@ -14,6 +14,10 @@ impl Plugin for CameraRenderingPlugin {
 fn setup_flycamera(mut commands: Commands) {
     commands.spawn((
         Camera3dBundle {
+            camera_3d: Camera3d {
+                clear_color: ClearColorConfig::Custom(Color::hex("A5DCFF").unwrap()),
+                ..default()
+            },
             transform: Transform::from_xyz(-3.0, 3.0, 10.).looking_at(Vec3::ZERO, Vec3::Y),
             projection: Projection::Perspective(PerspectiveProjection {
                 aspect_ratio: 16. / 9.,

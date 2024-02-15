@@ -41,12 +41,12 @@ fn main() {
         .add_plugins(CameraRenderingPlugin)
         .add_plugins(ObstaclePlugin)
         .add_systems(Startup, ground::spawn_ground)
-        // .add_systems(Startup, setup_physics)
+        .add_systems(Startup, setup_ball)
         // Run
         .run();
 }
 
-fn setup_physics(
+fn setup_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
