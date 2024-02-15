@@ -18,7 +18,7 @@ pub fn uv_debug_texture() -> Image {
         palette.rotate_right(4);
     }
 
-    Image::new_fill(
+    let img = Image::new_fill(
         Extent3d {
             width: TEXTURE_SIZE as u32,
             height: TEXTURE_SIZE as u32,
@@ -27,5 +27,7 @@ pub fn uv_debug_texture() -> Image {
         TextureDimension::D2,
         &texture_data,
         TextureFormat::Rgba8UnormSrgb,
-    )
+    );
+
+    img
 }

@@ -15,6 +15,12 @@ fn setup_flycamera(mut commands: Commands) {
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(-3.0, 3.0, 10.).looking_at(Vec3::ZERO, Vec3::Y),
+            projection: Projection::Perspective(PerspectiveProjection {
+                aspect_ratio: 16. / 9.,
+                near: 0.001,
+                far: 1000.0,
+                ..default()
+            }),
             ..default()
         },
         FlyCam,

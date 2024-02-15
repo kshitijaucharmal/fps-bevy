@@ -1,15 +1,19 @@
 // Imports
 use bevy::{prelude::*, render::mesh::shape, window::Cursor};
 use bevy_rapier3d::prelude::*;
+
+// File imports
 use camera::CameraRenderingPlugin;
 use debug_tex::uv_debug_texture;
 use environment::EnvironmentPlugin;
+use obstacles::ObstaclePlugin;
 
 // Mods
 mod camera;
 mod debug_tex;
 mod environment;
 mod ground;
+mod obstacles;
 
 fn main() {
     App::new()
@@ -32,12 +36,12 @@ fn main() {
         )
         // Rapier
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
-        // .add_plugins(RapierDebugRenderPlugin::default())
+        .add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(EnvironmentPlugin)
         .add_plugins(CameraRenderingPlugin)
+        .add_plugins(ObstaclePlugin)
         .add_systems(Startup, ground::spawn_ground)
-        .add_systems(Startup, setup_physics)
-        .add_systems(Update, kill_ball_if_underground)
+        // .add_systems(Startup, setup_physics)
         // Run
         .run();
 }
@@ -52,17 +56,6 @@ fn setup_physics(
         base_color_texture: Some(images.add(uv_debug_texture())),
         ..default()
     });
-
-    // Box
-    commands
-        .spawn(Collider::cuboid(0.5, 1., 0.5))
-        .insert(TransformBundle::from(Transform::from_xyz(0.6, -1., 0.6)))
-        .insert(PbrBundle {
-            mesh: meshes.add(shape::Box::new(1., 2., 1.).into()),
-            material: debug_material.clone(),
-            transform: Transform::from_xyz(0.6, -1., 0.6),
-            ..default()
-        });
 
     /* Create the bouncing ball. */
     commands
@@ -82,15 +75,4 @@ fn setup_physics(
             transform: Transform::from_xyz(0.0, 4.0, 0.0),
             ..default()
         });
-}
-
-fn kill_ball_if_underground(
-    mut commands: Commands,
-    positions: Query<(Entity, &Transform), With<RigidBody>>,
-) {
-    for (entity, transform) in positions.iter() {
-        if transform.translation.y <= -100. {
-            commands.entity(entity).despawn();
-        }
-    }
 }

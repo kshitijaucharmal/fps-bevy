@@ -10,6 +10,13 @@ impl Plugin for EnvironmentPlugin {
 }
 
 fn setup_lights(mut commands: Commands) {
+    // Global AmbientLight
+    commands.insert_resource(AmbientLight {
+        color: Color::WHITE,
+        brightness: 0.2,
+    });
+
+    // Pointlight
     commands.spawn(PointLightBundle {
         point_light: PointLight {
             intensity: 9000.0,
