@@ -6,6 +6,7 @@ use bevy_rapier3d::prelude::*;
 use camera::CameraRenderingPlugin;
 use debug_tex::uv_debug_texture;
 use environment::EnvironmentPlugin;
+use keybinds::KeyBinds;
 use obstacles::ObstaclePlugin;
 use player::PlayerPlugin;
 
@@ -14,6 +15,7 @@ mod camera;
 mod debug_tex;
 mod environment;
 mod ground;
+mod keybinds;
 mod obstacles;
 mod player;
 
@@ -36,6 +38,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
         )
+        .insert_resource(KeyBinds::default())
         // Rapier
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugins(RapierDebugRenderPlugin::default())

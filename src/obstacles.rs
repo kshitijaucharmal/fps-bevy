@@ -32,11 +32,11 @@ fn setup_obstacles(
     let blocks: [Obstacle; 3] = [
         Obstacle {
             size: Vec3::new(0.5, 1., 0.5),
-            pos: Transform::from_xyz(0.6, -1., 0.6),
+            pos: Transform::from_xyz(4.6, -1., 0.6),
         },
         Obstacle {
             size: Vec3::new(0.5, 1., 0.5),
-            pos: Transform::from_xyz(4.6, -1., 0.6),
+            pos: Transform::from_xyz(1.6, -1., 0.6),
         },
         Obstacle {
             size: Vec3::new(0.5, 1., 0.5),
