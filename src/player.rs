@@ -1,9 +1,14 @@
-use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, prelude::*};
 use bevy_rapier3d::{
-    control::KinematicCharacterController, dynamics::RigidBody, geometry::Collider,
+    control::KinematicCharacterController,
+    dynamics::{LockedAxes, RigidBody},
+    geometry::Collider,
 };
 
-use crate::keybinds::KeyBinds;
+use crate::{
+    camera::setup_fpscam,
+    keybinds::{InputState, KeyBinds},
+};
 
 #[derive(Component)]
 pub struct Player {
@@ -16,7 +21,7 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player)
-            .add_systems(Update, gravity)
+            .add_systems(Update, rotation)
             .add_systems(Update, movement);
     }
 }
@@ -29,13 +34,14 @@ fn setup_player(
     let size = (1., 0.5);
     let transform = Transform::from_xyz(0.0, 1.0, 0.0);
 
-    commands
+    let player_id = commands
         .spawn(Collider::cylinder(size.0, size.1))
         .insert(Player {
             speed: 10.,
             jump_force: 1000.,
         })
-        .insert(RigidBody::KinematicVelocityBased)
+        .insert(RigidBody::Dynamic)
+        .insert(LockedAxes::ROTATION_LOCKED)
         .insert(KinematicCharacterController::default())
         .insert(TransformBundle::from_transform(transform))
         .insert(PbrBundle {
@@ -50,13 +56,22 @@ fn setup_player(
             material: materials.add(Color::GRAY.into()),
             transform: transform,
             ..default()
-        });
+        })
+        .id();
+
+    // Setup camera and add it as child of player
+    let cam_id = setup_fpscam(&mut commands, Vec3::new(0., 0.95, 0.1));
+    commands.entity(player_id).push_children(&[cam_id]);
 }
 
-fn gravity(mut controllers: Query<&mut KinematicCharacterController, With<Player>>) {
-    for mut controller in controllers.iter_mut() {
-        controller.translation = Some(Vec3::new(0.0, -0.05, 0.0));
-    }
+fn rotation(
+    mut query: Query<(&mut KinematicCharacterController, &Player), With<Player>>,
+    motion: Res<Events<MouseMotion>>,
+    mut state: ResMut<InputState>,
+) {
+    // for ev in state.reader_motion.read(&motion) {
+    //     println!("{} - {}", ev.delta.x, ev.delta.x);
+    // }
 }
 
 fn movement(

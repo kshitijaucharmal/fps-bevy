@@ -6,7 +6,7 @@ use bevy_rapier3d::prelude::*;
 use camera::CameraRenderingPlugin;
 use debug_tex::uv_debug_texture;
 use environment::EnvironmentPlugin;
-use keybinds::KeyBinds;
+use keybinds::{InputState, KeyBinds};
 use obstacles::ObstaclePlugin;
 use player::PlayerPlugin;
 
@@ -28,6 +28,7 @@ fn main() {
                     primary_window: Some(Window {
                         cursor: Cursor {
                             visible: false,
+                            grab_mode: bevy::window::CursorGrabMode::Locked,
                             ..default()
                         },
                         title: "FPS Game".to_string(),
@@ -39,6 +40,7 @@ fn main() {
                 .set(ImagePlugin::default_nearest()),
         )
         .insert_resource(KeyBinds::default())
+        .insert_resource(InputState::default())
         // Rapier
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugins(RapierDebugRenderPlugin::default())

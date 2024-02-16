@@ -1,4 +1,10 @@
-use bevy::prelude::*;
+use bevy::{ecs::event::ManualEventReader, input::mouse::MouseMotion, prelude::*};
+
+/// Keeps track of mouse motion events, pitch, and yaw
+#[derive(Resource, Default)]
+pub struct InputState {
+    pub reader_motion: ManualEventReader<MouseMotion>,
+}
 
 /// Key configuration
 #[derive(Resource)]
