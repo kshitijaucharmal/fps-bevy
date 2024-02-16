@@ -55,14 +55,15 @@ fn rotation(
     time: Res<Time>,
 ) {
     let (mut cam_transform, camera) = query.single_mut();
-    let (_, mut pitch, _) = cam_transform.rotation.to_euler(EulerRot::YXZ);
+    let (mut yaw, mut pitch, _) = cam_transform.rotation.to_euler(EulerRot::YXZ);
 
     for ev in state.reader_motion.read(&motion) {
         pitch -= camera.sensitivity * ev.delta.y * time.delta_seconds();
+        yaw -= camera.sensitivity * ev.delta.x * time.delta_seconds();
     }
 
     pitch = pitch.clamp(-1.54, 1.54);
 
     cam_transform.rotation =
-        Quat::from_axis_angle(Vec3::Y, 180. * PI / 180.0) * Quat::from_axis_angle(Vec3::X, pitch);
+        Quat::from_axis_angle(Vec3::Y, yaw) * Quat::from_axis_angle(Vec3::X, pitch);
 }

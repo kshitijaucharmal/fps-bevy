@@ -4,6 +4,7 @@ use bevy_rapier3d::{
     dynamics::{LockedAxes, RigidBody},
     geometry::Collider,
 };
+use std::f32::consts::PI;
 
 use crate::{
     camera::setup_fpscam,
@@ -14,6 +15,7 @@ use crate::{
 pub struct Player {
     pub speed: f32,
     pub jump_force: f32,
+    pub sensitivity: f32,
 }
 
 pub struct PlayerPlugin;
@@ -21,7 +23,6 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player)
-            .add_systems(Update, rotation)
             .add_systems(Update, movement);
     }
 }
@@ -39,6 +40,7 @@ fn setup_player(
         .insert(Player {
             speed: 10.,
             jump_force: 1000.,
+            sensitivity: 0.5,
         })
         .insert(RigidBody::Dynamic)
         .insert(LockedAxes::ROTATION_LOCKED)
@@ -62,16 +64,6 @@ fn setup_player(
     // Setup camera and add it as child of player
     let cam_id = setup_fpscam(&mut commands, Vec3::new(0., 0.95, 0.1));
     commands.entity(player_id).push_children(&[cam_id]);
-}
-
-fn rotation(
-    mut query: Query<(&mut KinematicCharacterController, &Player), With<Player>>,
-    motion: Res<Events<MouseMotion>>,
-    mut state: ResMut<InputState>,
-) {
-    // for ev in state.reader_motion.read(&motion) {
-    //     println!("{} - {}", ev.delta.x, ev.delta.x);
-    // }
 }
 
 fn movement(

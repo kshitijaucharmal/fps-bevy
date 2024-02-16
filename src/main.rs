@@ -32,7 +32,6 @@ fn main() {
                             ..default()
                         },
                         title: "FPS Game".to_string(),
-                        //resolution: (640., 480.).into(),
                         ..default()
                     }),
                     ..default()
