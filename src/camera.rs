@@ -53,6 +53,7 @@ fn rotation(
     motion: Res<Events<MouseMotion>>,
     mut state: ResMut<InputState>,
     time: Res<Time>,
+    mut gizmos: Gizmos,
 ) {
     let (mut cam_transform, camera) = query.single_mut();
     let (mut yaw, mut pitch, _) = cam_transform.rotation.to_euler(EulerRot::YXZ);

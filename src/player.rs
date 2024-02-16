@@ -1,4 +1,8 @@
-use bevy::{input::mouse::MouseMotion, prelude::*};
+use bevy::{
+    input::mouse::MouseMotion,
+    prelude::*,
+    utils::{info, petgraph::stable_graph::GraphIndex},
+};
 use bevy_rapier3d::{
     control::KinematicCharacterController,
     dynamics::{LockedAxes, RigidBody},
@@ -7,7 +11,7 @@ use bevy_rapier3d::{
 use std::f32::consts::PI;
 
 use crate::{
-    camera::setup_fpscam,
+    camera::{setup_fpscam, FPSCamera},
     keybinds::{InputState, KeyBinds},
 };
 
@@ -23,6 +27,7 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player)
+            .add_systems(Update, rotation)
             .add_systems(Update, movement);
     }
 }
@@ -56,7 +61,7 @@ fn setup_player(
                 .into(),
             ),
             material: materials.add(Color::GRAY.into()),
-            transform: transform,
+            transform,
             ..default()
         })
         .id();
@@ -66,14 +71,32 @@ fn setup_player(
     commands.entity(player_id).push_children(&[cam_id]);
 }
 
+fn rotation(
+    mut query: Query<(&mut Transform, &Player), With<Player>>,
+    motion: Res<Events<MouseMotion>>,
+    mut state: ResMut<InputState>,
+    time: Res<Time>,
+) {
+    let (mut transform, player) = query.single_mut();
+    let (mut yaw, _, _) = transform.rotation.to_euler(EulerRot::YXZ);
+
+    for ev in state.reader_motion.read(&motion) {
+        yaw -= player.sensitivity * ev.delta.x * time.delta_seconds();
+    }
+
+    transform.rotation = Quat::from_axis_angle(Vec3::Y, yaw);
+}
+
 fn movement(
     keys: Res<Input<KeyCode>>,
     binds: Res<KeyBinds>,
-    mut query: Query<(&mut KinematicCharacterController, &Player), With<Player>>,
+    mut query: Query<(&mut KinematicCharacterController, &Player, &mut Transform), With<Player>>,
+    mut cam_query: Query<(&mut Transform, &FPSCamera), Without<Player>>,
     time: Res<Time>,
 ) {
     let mut movement = Vec3::new(0.0, 0.0, 0.);
-    let (mut controller, player) = query.single_mut();
+    let mut cam_transform = cam_query.single_mut();
+    let (mut controller, player, mut transform) = query.single_mut();
 
     for key in keys.get_pressed() {
         let key = *key;
@@ -90,7 +113,9 @@ fn movement(
             movement.x = -1.;
         }
 
-        controller.translation =
-            Some(movement.normalize_or_zero() * player.speed * time.delta_seconds());
+        let m = movement.normalize_or_zero();
+        // let t = m * transform.forward();
+
+        controller.translation = Some(m * player.speed * time.delta_seconds());
     }
 }

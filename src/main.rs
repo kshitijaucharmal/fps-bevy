@@ -25,7 +25,7 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        mode: bevy::window::WindowMode::BorderlessFullscreen,
+                        // mode: bevy::window::WindowMode::BorderlessFullscreen,
                         cursor: Cursor {
                             visible: false,
                             grab_mode: bevy::window::CursorGrabMode::Locked,
