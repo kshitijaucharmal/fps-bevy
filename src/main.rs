@@ -4,7 +4,6 @@ use bevy_rapier3d::prelude::*;
 
 // File imports
 use camera::CameraRenderingPlugin;
-use debug_tex::uv_debug_texture;
 use environment::EnvironmentPlugin;
 use keybinds::{InputState, KeyBinds};
 use obstacles::ObstaclePlugin;
@@ -26,13 +25,14 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
+                        mode: bevy::window::WindowMode::BorderlessFullscreen,
                         cursor: Cursor {
                             visible: false,
                             grab_mode: bevy::window::CursorGrabMode::Locked,
                             ..default()
                         },
                         title: "FPS Game".to_string(),
-                        resolution: (640., 480.).into(),
+                        //resolution: (640., 480.).into(),
                         ..default()
                     }),
                     ..default()
@@ -57,14 +57,8 @@ fn main() {
 fn setup_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    let debug_material = materials.add(StandardMaterial {
-        base_color_texture: Some(images.add(uv_debug_texture())),
-        ..default()
-    });
-
     /* Create the bouncing ball. */
     commands
         .spawn(RigidBody::Dynamic)
@@ -79,7 +73,7 @@ fn setup_ball(
                 }
                 .into(),
             ),
-            material: debug_material.clone(),
+            material: materials.add(Color::RED.into()),
             transform: Transform::from_xyz(0.0, 4.0, 0.0),
             ..default()
         });

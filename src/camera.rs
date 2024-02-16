@@ -13,14 +13,13 @@ pub struct FPSCamera {
 
 impl Default for FPSCamera {
     fn default() -> Self {
-        Self { sensitivity: 0.05 }
+        Self { sensitivity: 0.2 }
     }
 }
 
 impl Plugin for CameraRenderingPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, reset_camera)
-            .add_systems(Update, rotation);
+        app.add_systems(Update, rotation);
     }
 }
 
@@ -35,6 +34,7 @@ pub fn setup_fpscam(commands: &mut Commands, pos: Vec3) -> Entity {
                 transform: Transform::from_xyz(pos.x, pos.y, pos.z)
                     .with_rotation(Quat::from_euler(EulerRot::XYZ, 0.0, 180.0 * PI / 180., 0.0)),
                 projection: Projection::Perspective(PerspectiveProjection {
+                    fov: -80.,
                     aspect_ratio: 16. / 9.,
                     near: 0.001,
                     far: 1000.0,
@@ -48,13 +48,6 @@ pub fn setup_fpscam(commands: &mut Commands, pos: Vec3) -> Entity {
     cam.id()
 }
 
-fn reset_camera(mut camera_q: Query<&mut Transform, With<FPSCamera>>, keys: Res<Input<KeyCode>>) {
-    if keys.just_pressed(KeyCode::R) {
-        let mut cam_transform = camera_q.single_mut();
-        *cam_transform = Transform::from_xyz(-3.0, 3.0, 10.).looking_at(Vec3::ZERO, Vec3::Y);
-    }
-}
-
 fn rotation(
     mut query: Query<(&mut Transform, &FPSCamera)>,
     motion: Res<Events<MouseMotion>>,
@@ -62,15 +55,14 @@ fn rotation(
     time: Res<Time>,
 ) {
     let (mut cam_transform, camera) = query.single_mut();
-    let (mut yaw, mut pitch, _) = cam_transform.rotation.to_euler(EulerRot::YXZ);
+    let (_, mut pitch, _) = cam_transform.rotation.to_euler(EulerRot::YXZ);
 
     for ev in state.reader_motion.read(&motion) {
         pitch -= camera.sensitivity * ev.delta.y * time.delta_seconds();
-        yaw -= camera.sensitivity * ev.delta.x * time.delta_seconds();
     }
 
     pitch = pitch.clamp(-1.54, 1.54);
 
     cam_transform.rotation =
-        Quat::from_axis_angle(Vec3::Y, yaw) * Quat::from_axis_angle(Vec3::X, pitch);
+        Quat::from_axis_angle(Vec3::Y, 180. * PI / 180.0) * Quat::from_axis_angle(Vec3::X, pitch);
 }
