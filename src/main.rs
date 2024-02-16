@@ -70,7 +70,7 @@ fn setup_ball(
         .spawn(RigidBody::Dynamic)
         .insert(Collider::ball(0.5))
         .insert(Restitution::coefficient(1.7))
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 0.0)))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 2.8)))
         .insert(PbrBundle {
             mesh: meshes.add(
                 shape::UVSphere {
