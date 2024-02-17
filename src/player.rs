@@ -1,5 +1,6 @@
 use crate::{
     camera::{setup_fpscam, FPSCamera},
+    environment::setup_player_light,
     keybinds::KeyBinds,
 };
 use bevy::prelude::*;
@@ -62,6 +63,8 @@ fn setup_player(
     // Setup camera and add it as child of player
     let cam_id = setup_fpscam(&mut commands, Vec3::new(0., 0.95, 0.4));
     commands.entity(player_id).push_children(&[cam_id]);
+    let light_id = setup_player_light(&mut commands);
+    commands.entity(player_id).push_children(&[light_id]);
 }
 
 fn movement(

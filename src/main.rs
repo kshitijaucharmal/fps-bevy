@@ -3,6 +3,7 @@ use bevy::{prelude::*, render::mesh::shape, window::Cursor};
 use bevy_rapier3d::prelude::*;
 
 // File imports
+use crate::debug_tex::uv_debug_texture;
 use camera::CameraRenderingPlugin;
 use environment::EnvironmentPlugin;
 use keybinds::{InputState, KeyBinds};
@@ -58,13 +59,18 @@ fn setup_ball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut images: ResMut<Assets<Image>>,
 ) {
+    let debug_material = materials.add(StandardMaterial {
+        base_color_texture: Some(images.add(uv_debug_texture())),
+        ..default()
+    });
     /* Create the bouncing ball. */
     commands
         .spawn(RigidBody::Dynamic)
         .insert(Collider::ball(0.5))
         .insert(Restitution::coefficient(1.0))
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 2.8)))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 10.)))
         .insert(PbrBundle {
             mesh: meshes.add(
                 shape::UVSphere {
@@ -73,8 +79,8 @@ fn setup_ball(
                 }
                 .into(),
             ),
-            material: materials.add(Color::RED.into()),
-            transform: Transform::from_xyz(0.0, 4.0, 0.0),
+            material: debug_material.clone(),
+            transform: Transform::from_xyz(0.0, 4.0, 10.0),
             ..default()
         });
 }

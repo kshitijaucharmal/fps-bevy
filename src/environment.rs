@@ -13,18 +13,23 @@ fn setup_lights(mut commands: Commands) {
     // Global AmbientLight
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
-        brightness: 0.7,
+        brightness: 0.0,
     });
+}
 
-    // Pointlight
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            intensity: 20000.0,
-            range: 1000.,
-            shadows_enabled: true,
+pub fn setup_player_light(commands: &mut Commands) -> Entity {
+    let light_id = commands
+        .spawn(PointLightBundle {
+            point_light: PointLight {
+                intensity: 2000.0,
+                range: 100.,
+                shadows_enabled: true,
+                ..default()
+            },
+            transform: Transform::from_xyz(0.0, 10.0, 0.0),
             ..default()
-        },
-        transform: Transform::from_xyz(8.0, 16.0, 8.0),
-        ..default()
-    });
+        })
+        .id();
+
+    light_id
 }

@@ -36,7 +36,7 @@ pub fn setup_fpscam(commands: &mut Commands, pos: Vec3) -> Entity {
                     .with_rotation(Quat::from_euler(EulerRot::XYZ, 0.0, 180.0 * PI / 180., 0.0)),
                 projection: Projection::Perspective(PerspectiveProjection {
                     fov: -80.,
-                    aspect_ratio: 16. / 10.,
+                    // aspect_ratio: 16. / 10.,
                     near: 0.001,
                     far: 1000.0,
                     ..default()
