@@ -3,6 +3,7 @@ use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 use std::f32::consts::PI;
 
 use crate::keybinds::InputState;
+use crate::player::Player;
 
 pub struct CameraRenderingPlugin;
 
@@ -35,7 +36,7 @@ pub fn setup_fpscam(commands: &mut Commands, pos: Vec3) -> Entity {
                     .with_rotation(Quat::from_euler(EulerRot::XYZ, 0.0, 180.0 * PI / 180., 0.0)),
                 projection: Projection::Perspective(PerspectiveProjection {
                     fov: -80.,
-                    aspect_ratio: 16. / 9.,
+                    aspect_ratio: 16. / 10.,
                     near: 0.001,
                     far: 1000.0,
                     ..default()
@@ -49,11 +50,10 @@ pub fn setup_fpscam(commands: &mut Commands, pos: Vec3) -> Entity {
 }
 
 fn rotation(
-    mut query: Query<(&mut Transform, &FPSCamera)>,
+    mut query: Query<(&mut Transform, &FPSCamera), Without<Player>>,
     motion: Res<Events<MouseMotion>>,
     mut state: ResMut<InputState>,
     time: Res<Time>,
-    mut gizmos: Gizmos,
 ) {
     let (mut cam_transform, camera) = query.single_mut();
     let (mut yaw, mut pitch, _) = cam_transform.rotation.to_euler(EulerRot::YXZ);

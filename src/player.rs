@@ -1,18 +1,12 @@
-use bevy::{
-    input::mouse::MouseMotion,
-    prelude::*,
-    utils::{info, petgraph::stable_graph::GraphIndex},
+use crate::{
+    camera::{setup_fpscam, FPSCamera},
+    keybinds::KeyBinds,
 };
+use bevy::prelude::*;
 use bevy_rapier3d::{
     control::KinematicCharacterController,
     dynamics::{LockedAxes, RigidBody},
     geometry::Collider,
-};
-use std::f32::consts::PI;
-
-use crate::{
-    camera::{setup_fpscam, FPSCamera},
-    keybinds::{InputState, KeyBinds},
 };
 
 #[derive(Component)]
@@ -27,7 +21,6 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_player)
-            .add_systems(Update, rotation)
             .add_systems(Update, movement);
     }
 }
@@ -43,7 +36,7 @@ fn setup_player(
     let player_id = commands
         .spawn(Collider::cylinder(size.0, size.1))
         .insert(Player {
-            speed: 10.,
+            speed: 8.,
             jump_force: 1000.,
             sensitivity: 0.5,
         })
@@ -67,55 +60,37 @@ fn setup_player(
         .id();
 
     // Setup camera and add it as child of player
-    let cam_id = setup_fpscam(&mut commands, Vec3::new(0., 0.95, 0.1));
+    let cam_id = setup_fpscam(&mut commands, Vec3::new(0., 0.95, 0.4));
     commands.entity(player_id).push_children(&[cam_id]);
-}
-
-fn rotation(
-    mut query: Query<(&mut Transform, &Player), With<Player>>,
-    motion: Res<Events<MouseMotion>>,
-    mut state: ResMut<InputState>,
-    time: Res<Time>,
-) {
-    let (mut transform, player) = query.single_mut();
-    let (mut yaw, _, _) = transform.rotation.to_euler(EulerRot::YXZ);
-
-    for ev in state.reader_motion.read(&motion) {
-        yaw -= player.sensitivity * ev.delta.x * time.delta_seconds();
-    }
-
-    transform.rotation = Quat::from_axis_angle(Vec3::Y, yaw);
 }
 
 fn movement(
     keys: Res<Input<KeyCode>>,
     binds: Res<KeyBinds>,
-    mut query: Query<(&mut KinematicCharacterController, &Player, &mut Transform), With<Player>>,
-    mut cam_query: Query<(&mut Transform, &FPSCamera), Without<Player>>,
+    mut query: Query<(&mut Transform, &Player), With<Player>>,
+    mut cam_query: Query<(&Transform, &FPSCamera), Without<Player>>,
     time: Res<Time>,
 ) {
-    let mut movement = Vec3::new(0.0, 0.0, 0.);
-    let mut cam_transform = cam_query.single_mut();
-    let (mut controller, player, mut transform) = query.single_mut();
+    let (cam_transform, _) = cam_query.single_mut();
+    let (mut controller, player) = query.single_mut();
 
+    let mut t: Vec3 = Vec3::ZERO;
     for key in keys.get_pressed() {
         let key = *key;
         if key == binds.forward || key == binds.forward_alt {
-            movement.z = 1.;
+            t = cam_transform.forward();
         }
         if key == binds.backward || key == binds.backward_alt {
-            movement.z = -1.;
+            t = -cam_transform.forward();
         }
         if key == binds.left || key == binds.left_alt {
-            movement.x = 1.;
+            t = -cam_transform.right();
         }
         if key == binds.right || key == binds.right_alt {
-            movement.x = -1.;
+            t = cam_transform.right();
         }
-
-        let m = movement.normalize_or_zero();
-        // let t = m * transform.forward();
-
-        controller.translation = Some(m * player.speed * time.delta_seconds());
     }
+
+    t = t.normalize_or_zero() * Vec3::new(1., 0., 1.);
+    controller.translation += t * player.speed * time.delta_seconds();
 }

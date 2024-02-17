@@ -25,12 +25,13 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        // mode: bevy::window::WindowMode::BorderlessFullscreen,
+                        mode: bevy::window::WindowMode::BorderlessFullscreen,
                         cursor: Cursor {
                             visible: false,
                             grab_mode: bevy::window::CursorGrabMode::Locked,
                             ..default()
                         },
+                        // resolution: (640., 480.).into(),
                         title: "FPS Game".to_string(),
                         ..default()
                     }),
@@ -42,7 +43,7 @@ fn main() {
         .insert_resource(InputState::default())
         // Rapier
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugins(RapierDebugRenderPlugin::default())
+        // .add_plugins(RapierDebugRenderPlugin::default())
         .add_plugins(EnvironmentPlugin)
         .add_plugins(CameraRenderingPlugin)
         .add_plugins(ObstaclePlugin)
@@ -62,7 +63,7 @@ fn setup_ball(
     commands
         .spawn(RigidBody::Dynamic)
         .insert(Collider::ball(0.5))
-        .insert(Restitution::coefficient(1.7))
+        .insert(Restitution::coefficient(1.0))
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 2.8)))
         .insert(PbrBundle {
             mesh: meshes.add(
